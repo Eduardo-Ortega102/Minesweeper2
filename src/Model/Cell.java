@@ -47,9 +47,9 @@ public class Cell implements Observable {
     }
 
     public void lock(String mode) {
-        if (this.state == CellState.MARKED && !hasMine()){
+        if (this.state == CellState.MARKED) {
             this.state = CellState.LOCKED;
-            notifyObservers("errorMarked");
+            if (!hasMine()) notifyObservers("errorMarked");
         }
         if (this.state != CellState.CLOSED) return;
         this.state = CellState.LOCKED;
