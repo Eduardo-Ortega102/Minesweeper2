@@ -11,9 +11,7 @@ import Model.Cell;
 import Model.ImageSet;
 import Model.abstractInterface.Bitmap;
 import Model.abstractInterface.BuilderException;
-import Persistence.FileImageLoader;
 import Persistence.FileImageSetLoader;
-import Persistence.ProxyImage;
 import Persistence.abstractInterface.BitmapFactory;
 import Persistence.abstractInterface.ImageSetLoader;
 import UserInterface.ApplicationFrameSwing;
@@ -115,22 +113,9 @@ public class Application {
             @Override
             public CellViewer createCellViewer(Cell cell) {
                 CellViewerSwing viewer = new CellViewerSwing(cell, actionFactory);
-                ObserverImageControl control = new ObserverImageControl(viewer, createImageSet("src\\Icons"));
+                ObserverImageControl control = new ObserverImageControl(viewer, imageSetLoader.loadImageSet());
                 viewer.addObserver(control);
                 return viewer;
-            }
-
-            private ImageSet createImageSet(String path) {
-                ImageSet set = new ImageSet();
-                set.put("explodedIcon.jpg", new ProxyImage(
-                        new FileImageLoader(path + "\\" + "explodedIcon.jpg", createBitmapFactory())));
-                set.put("mineIcon.jpg", new ProxyImage(
-                        new FileImageLoader(path + "\\" + "mineIcon.jpg", createBitmapFactory())));
-                set.put("markedIcon.jpg", new ProxyImage(
-                        new FileImageLoader(path + "\\" + "markedIcon.jpg", createBitmapFactory())));
-                set.put("errorMarkedIcon.jpg", new ProxyImage(
-                        new FileImageLoader(path + "\\" + "errorMarkedIcon.jpg", createBitmapFactory())));
-                return set;
             }
         };
     }
@@ -163,7 +148,8 @@ public class Application {
         return new FileImageSetLoader(
                 createBitmapFactory(),
                 "src\\Icons",
-                "winnerIcon.jpg", "waitIcon.jpg", "moveIcon.jpg", "loserIcon.jpg");
+                "winnerIcon.jpg", "waitIcon.jpg", "moveIcon.jpg", "loserIcon.jpg",
+                "explodedIcon.jpg","mineIcon.jpg", "markedIcon.jpg","errorMarkedIcon.jpg");
     }
 
     private BitmapFactory createBitmapFactory() {
