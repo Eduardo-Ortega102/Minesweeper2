@@ -58,7 +58,7 @@ public class Application {
     private ImageViewerControl imageViewerControl;
     private ImageSetLoader imageSetLoader;
     private ImageViewerControlFactory imageControlFactory;
-    private BoardBuilder boardBuilder;
+    private BoardBuilder builder;
 
     private void execute() {
         this.actionListenerFactory = createActionListenerFactory();
@@ -70,7 +70,7 @@ public class Application {
         this.imageControlFactory = createImageControlFactory();
         this.imageViewerControl = imageControlFactory.
                 createImageViewerControl(this.imageViewer, this.imageSetLoader.loadImageSet());
-        this.boardBuilder = createBoardBuilder();
+        this.builder = createBoardBuilder();
         this.board = new Board();
 
         this.applicationFrame = createApplicationFrame();
@@ -281,10 +281,10 @@ public class Application {
     private void runApplication() {
         this.imageViewerControl.viewImage("waitIcon.jpg");
         try {
-            boardBuilder.buildBoard(optionDialog.getRowsAmount(),
+            builder.buildBoard(optionDialog.getRowsAmount(),
                     optionDialog.getColumnAmount(),
                     optionDialog.getMinesAmount());
-            board.setBoard(boardBuilder.getBoard(), boardBuilder.getMinesNumber());
+            board.setBoard(builder.getBoard(), builder.getMinesNumber());
             applicationFrame.getBoardViewer().load(board);
             applicationFrame.execute();
         } catch (BuilderException ex) {
