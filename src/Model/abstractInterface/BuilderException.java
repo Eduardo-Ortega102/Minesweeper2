@@ -1,8 +1,8 @@
 package Model.abstractInterface;
 
-public class BoardException extends Exception {
+public class BuilderException extends Exception {
 
-    public BoardException() {
+    public BuilderException() {
         super("Parámetros de creación erróneos.");
     }
 

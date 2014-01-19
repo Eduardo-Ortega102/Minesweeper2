@@ -14,11 +14,7 @@ public final class Clock implements Observable {
     private Observer observer;
 
     public Clock() {
-//        this.resetClock();
     }
-//    public Clock(Observer observer) {
-//        this.observer = observer;
-//    }
 
     public void startClock() {
         this.resetClock();

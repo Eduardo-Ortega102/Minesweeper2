@@ -1,136 +1,33 @@
 package Model;
 
-import Model.abstractInterface.Mine;
-import Model.abstractInterface.BoardException;
 import Model.abstractInterface.Observable;
 import Model.abstractInterface.Observer;
-import java.util.Random;
 
 public class Board implements Observable {
 
-    private Cell[][] board;
     private Observer viewerObserver;
     private Clock clock;
     private int minesNumber;
-    private int[] minesPerRow;
-    private int maxMinePerRow;
-    private int availableCells;
+    private Cell[][] board;
     private int high;
     private int width;
     private boolean firstTime;
+    private int availableCells;
 
-    public Board(Clock clock) {
-        this.clock = clock;
+    public Board() {
+        this.clock = new Clock();
     }
 
-    public Cell[][] getBoard() {
-        return board;
-    }
-
-    public int getMinesNumber() {
-        return minesNumber;
-    }
-
-    public int getHigh() {
-        return high;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public Clock getClock() {
-        return clock;
-    }
-
-    public void buildBoard(int high, int width, int minesNumber) throws BoardException {
-        if (!checkParameters(high, width, minesNumber))
-            throw new BoardException();
+    public void setBoard(Cell[][] board, int minesNumber) {
         this.minesNumber = minesNumber;
-        this.high = high;
-        this.width = width;
-        this.maxMinePerRow = 1;
+        this.board = board;
+        this.high = board.length;
+        this.width = board[0].length;
         this.firstTime = true;
-        this.board = new Cell[this.high][this.width];
         this.availableCells = (this.high * this.width) - this.minesNumber;
-        inicializeMinesPerRow();
-        createMineField();
         setObservers();
-        this.clock.resetClock();
-
+        
         printBoard();
-    }
-
-    private boolean checkParameters(int high, int width, int minesNumber) {
-        if (high < 9 || high > 24) return false;
-        if (width < 9 || width > 30) return false;
-        if (minesNumber < 10 || minesNumber >= high * width || minesNumber > 668)
-            return false;
-        return true;
-    }
-
-    private void inicializeMinesPerRow() {
-        minesPerRow = new int[this.high];
-        for (int i = 0; i < minesPerRow.length; i++)
-            minesPerRow[i] = 0;
-    }
-
-    private void createMineField() {
-        for (int i = 0; i < this.high; i++)
-            for (int j = 0; j < this.width; j++)
-                board[i][j] = new Cell();
-        setNeighbors();
-        setMines();
-    }
-
-    private void setNeighbors() {
-        for (int i = 0; i < this.high; i++)
-            for (int j = 0; j < this.width; j++)
-                addNeighbors(i, j);
-    }
-
-    private void addNeighbors(int i, int j) {
-        for (int k = i - 1; k <= i + 1; k++)
-            for (int m = j - 1; m <= j + 1; m++)
-                if (existNeighbor(k, m))
-                    board[i][j].addNeighbor(board[k][m]);
-    }
-
-    private boolean existNeighbor(int i, int j) {
-        if (i < 0 || i > this.high - 1) return false;
-        if (j < 0 || j > this.width - 1) return false;
-        return true;
-    }
-
-    private void setMines() {
-        int cellAmount = this.high * this.width;
-        Random rand = new Random();
-        int minesSet = this.minesNumber;
-        while (minesSet > 0) {
-            for (int iteration = 0; iteration < cellAmount && minesSet > 0; iteration++) {
-                final int i = rand.nextInt(this.high);
-                final int j = rand.nextInt(this.width);
-                if (minesPerRow[i] == maxMinePerRow) continue;
-                if (board[i][j].hasMine()) continue;
-
-                if (putMine(minesSet)) {
-                    board[i][j].setMine(new Mine() {
-                        @Override
-                        public void explode() {
-                            board[i][j].notifyObservers("Exploded");
-                        }
-                    });
-                    minesPerRow[i]++;
-                    minesSet--;
-                }
-            }
-            maxMinePerRow += 1;
-        }
-    }
-
-    private boolean putMine(int minesSet) {
-        if (minesSet == 0) return false;
-        return ((Math.random()) > (1.0 / 2)) ? false : true;
     }
 
     private void setObservers() {
@@ -194,6 +91,26 @@ public class Board implements Observable {
             System.out.println(")");
         }
         System.out.println("Numero de minas = " + count);
+    }
+
+    public Cell[][] getBoard() {
+        return board;
+    }
+
+    public int getMinesNumber() {
+        return minesNumber;
+    }
+
+    public int getHigh() {
+        return high;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public Clock getClock() {
+        return clock;
     }
 
     @Override

@@ -6,11 +6,11 @@ import Control.ImageViewerControl;
 import Control.ImageViewerControlFactory;
 import Control.ObserverImageControl;
 import Model.Board;
+import Model.BoardBuilder;
 import Model.Cell;
-import Model.Clock;
 import Model.ImageSet;
 import Model.abstractInterface.Bitmap;
-import Model.abstractInterface.BoardException;
+import Model.abstractInterface.BuilderException;
 import Persistence.FileImageLoader;
 import Persistence.FileImageSetLoader;
 import Persistence.ProxyImage;
@@ -56,11 +56,11 @@ public class Application {
     private CellViewerFactory cellViewerFactory;
     private Dialog youWinDialog;
     private Dialog gameOverDialog;
-    private Clock clock;
     private ImageViewer imageViewer;
     private ImageViewerControl imageViewerControl;
     private ImageSetLoader imageSetLoader;
     private ImageViewerControlFactory imageControlFactory;
+    private BoardBuilder boardBuilder;
 
     private void execute() {
         this.actionListenerFactory = createActionListenerFactory();
@@ -70,12 +70,12 @@ public class Application {
         this.imageViewer = createImageViewer();
         this.imageSetLoader = createImageSetLoader();
         this.imageControlFactory = createImageControlFactory();
-        this.imageViewerControl = imageControlFactory.createImageViewerControl(this.imageViewer, this.imageSetLoader.loadImageSet());
-        this.clock = new Clock();
-        this.board = new Board(this.clock);
+        this.imageViewerControl = imageControlFactory.
+                createImageViewerControl(this.imageViewer, this.imageSetLoader.loadImageSet());
+        this.boardBuilder = createBoardBuilder();
+        this.board = new Board();
 
-        this.applicationFrame = new ApplicationFrameSwing(actionListenerFactory, createBoardViewer(),
-                createInfoPanel());
+        this.applicationFrame = createApplicationFrame();
         this.createCommands();
         this.optionDialog.showDialog();
     }
@@ -137,6 +137,14 @@ public class Application {
 
     private OptionDialog createOptionDialog(ActionFactory factory) {
         return new OptionDialogSwing(factory);
+    }
+
+    private BoardBuilder createBoardBuilder() {
+        return new BoardBuilder();
+    }
+
+    private ApplicationFrame createApplicationFrame() {
+        return new ApplicationFrameSwing(actionListenerFactory, createBoardViewer(), createInfoPanel());
     }
 
     private BoardViewer createBoardViewer() {
@@ -287,12 +295,13 @@ public class Application {
     private void runApplication() {
         this.imageViewerControl.viewImage("waitIcon.jpg");
         try {
-            board.buildBoard(optionDialog.getRowsAmount(),
+            boardBuilder.buildBoard(optionDialog.getRowsAmount(),
                     optionDialog.getColumnAmount(),
                     optionDialog.getMinesAmount());
+            board.setBoard(boardBuilder.getBoard(), boardBuilder.getMinesNumber());
             applicationFrame.getBoardViewer().load(board);
             applicationFrame.execute();
-        } catch (BoardException ex) {
+        } catch (BuilderException ex) {
             Dialog errorDialog = createErrorDialog(ex.getMessage());
             errorDialog.showDialog();
             optionDialog.showDialog();
